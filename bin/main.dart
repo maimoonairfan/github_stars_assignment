@@ -49,8 +49,7 @@ void main() async {
 
   final repos = result.data?['search']['nodes'];
 
-  // 5. Data ko Postgres mein insert karein
-  for (var repo in repos) {
+  // 5. Data ko Postgres mein insert 
     await conn.execute(
       r'INSERT INTO repositories (id, name_with_owner, url, stargazer_count) '
       r'VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET stargazer_count = $4',
