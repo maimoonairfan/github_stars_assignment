@@ -13,11 +13,11 @@ class RepoProvider extends ChangeNotifier {
 
   Future<void> loadRepos() async {
     _isLoading = true;
-    notifyListeners(); // UI ko batayen ke loading shuru ho gayi hai
+    notifyListeners(); 
 
     _repos = await _dbService.fetchReposFromDB();
 
     _isLoading = false;
-    notifyListeners(); // UI ko batayen ke data aa gaya hai
+    notifyListeners();
   }
 }
