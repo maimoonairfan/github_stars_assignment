@@ -13,7 +13,7 @@ class DBService {
       ),
       settings: const ConnectionSettings(
         sslMode: SslMode.disable,
-        connectTimeout: Duration(seconds: 10), // Timeout thoda barha den
+        connectTimeout: Duration(seconds: 10), 
       ),
     );
     final results = await conn.execute('SELECT * FROM repositories ORDER BY stargazer_count DESC');
