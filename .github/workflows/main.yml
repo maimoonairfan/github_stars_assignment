@@ -1,0 +1,56 @@
+name: GitHub Crawler Pipeline
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: github_crawler
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Create Database Table
+        run: |
+          sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d github_crawler -c "CREATE TABLE repositories (id VARCHAR(255) PRIMARY KEY, name_with_owner VARCHAR(255) NOT NULL, url TEXT, stargazer_count INT NOT NULL, last_crawled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);"
+        env:
+          PGPASSWORD: password
+
+      - name: Run Crawler
+        # Note: 'bin/main.dart' use kar rahay hain kyunke ye pure Dart script hai
+        run: dart bin/main.dart
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DB_PASSWORD: password
+
+      - name: Dump Database to CSV
+        run: |
+          psql -h localhost -U postgres -d github_crawler -c "COPY repositories TO STDOUT WITH CSV HEADER" > output.csv
+        env:
+          PGPASSWORD: password
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: github-repo-data
+          path: output.csv
