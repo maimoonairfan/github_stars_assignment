@@ -1,16 +1,12 @@
-# github_stars_assignment
+# GitHub Stars Crawler & Viewer
 
-A new Flutter project.
+### 1. Scaling to 500 Million Repositories
+- **Distributed Crawling:** Use multiple worker containers to fetch data in parallel.
+- **Database Sharding:** Partition the PostgreSQL database to handle millions of rows efficiently.
+- **Rate Limit Management:** Use a pool of GitHub tokens and rotate them to avoid API limits.
+- **Queuing:** Implement RabbitMQ or Kafka for task management and retries.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Schema Evolution (Metadata: PRs, Issues, Comments)
+- **Normalisation:** Create separate tables for `pull_requests` and `comments`, linked by `repo_id`.
+- **Efficient Updates:** Use `UPSERT` logic to update only changed rows (minimal row impact).
+- **Indexing:** Use proper indexing on `repo_id` and `updated_at` for fast querying.
